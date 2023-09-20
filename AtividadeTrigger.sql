@@ -86,3 +86,23 @@ INSERT INTO Item_Pedido (Num_Pedido, Cod_Produto, Quantidade, Valor)
 VALUES (10, 1, 3, 10);
 
 SELECT * FROM PRODUTO;
+
+/*trigger 4*/
+CREATE OR REPLACE TRIGGER Verifica_Prazo
+BEFORE INSERT OR UPDATE OF Prazo_Entrega ON Pedido
+FOR EACH ROW
+DECLARE
+    v_Data NUMBER(5);
+BEGIN 
+    v_Data := TO_NUMBER(TO_CHAR(SYSDATE, 'DD')) - TO_NUMBER(TO_CHAR(:NEW.Prazo_Entrega, 'DD'));
+    IF v_Data > 5
+    THEN 
+      :NEW.Prazo_Entrega := TO_DATE(:NEW.Prazo_Entrega, 'DD') + 5;
+    END IF;
+END;
+
+UPDATE Pedido
+SET Prazo_Entrega = TO_DATE(SYSDATE, 'YYYY-MM-DD')
+WHERE Num_Pedido = 3;
+
+SELECT * FROM Pedido;
