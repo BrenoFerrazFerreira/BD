@@ -31,8 +31,8 @@ BEFORE UPDATE OF Endereco ON Cliente
 FOR EACH ROW
 BEGIN 
   INSERT INTO TabLog (datalog,campo1,campo2) VALUES(TO_DATE( SYSDATE, 'YYYY-MM-DD'), 
-  'Observar mudança de endereço ' || :OLD.Cod_Cliente || ' ' || :OLD.Endereco,
-  'Observar mudança de endereço ' || :NEW.Cod_Cliente || ' ' || :NEW.Endereco);
+  'Observar mudanÃ§a de endereÃ§o ' || :OLD.Cod_Cliente || ' ' || :OLD.Endereco,
+  'Observar mudanÃ§a de endereÃ§o ' || :NEW.Cod_Cliente || ' ' || :NEW.Endereco);
 END;
 
 UPDATE Cliente 
@@ -76,7 +76,7 @@ BEGIN
     END IF;
     IF v_Quantidade = 0
     THEN 
-      RAISE_APPLICATION_ERROR(-20400,'Update não permitido');
+      RAISE_APPLICATION_ERROR(-20400,'Update nÃ£o permitido');
     END IF;
 END;
 
@@ -106,3 +106,32 @@ SET Prazo_Entrega = TO_DATE(SYSDATE, 'YYYY-MM-DD')
 WHERE Num_Pedido = 3;
 
 SELECT * FROM Pedido;
+
+/*teste trigger 4*/
+CREATE OR REPLACE TRIGGER Verifica_Prazo
+BEFORE INSERT OR UPDATE OF Prazo_Entrega ON Pedido
+FOR EACH ROW
+DECLARE
+    v_Data NUMBER(5);
+BEGIN 
+    v_Data := TO_NUMBER(TO_CHAR(SYSDATE, 'DD')) - TO_NUMBER(TO_CHAR(:NEW.Prazo_Entrega, 'DD'));
+    IF v_Data > 5
+    THEN 
+      IF :OLD.Prazo_Entrega IS NULL
+      THEN;
+
+UPDATE Pedido
+SET Prazo_Entrega = TO_DATE(SYSDATE, 'YYYY-
+        :NEW.Prazo_Entrega := TO_DATE(:NEW.Prazo_Entrega, 'DD') + 5;
+      ELSE
+        :NEW.Prazo_Entrega := TO_DATE(:NEW.Prazo_Entrega, 'DD') + 10;
+      END IF;
+    END IF;
+ENDMM-DD')
+WHERE Num_Pedido = 3;
+
+SELECT * FROM Pedido;
+
+SELECT TO_DATE(SYSDATE, 'YYYY-MM-DD') FROM DUAL;
+
+SELECT TO_DATE(TO_NUMBER(TO_CHAR(Prazo_Entrega, 'DD')) + 10) FROM Pedido;
